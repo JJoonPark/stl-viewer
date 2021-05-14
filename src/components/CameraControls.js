@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import GridMaker from './GridMaker'
 
 const CameraControls = () => {
   // Get a reference to the Three.js Camera, and the canvas html element.
@@ -12,16 +13,25 @@ const CameraControls = () => {
     gl: { domElement },
     scene,
   } = useThree();
-  camera.position.z = 160;
-  camera.position.y = -80;
+  camera.position.z = 200;
+  camera.position.y = -30;
   camera.position.x = 0;
   // Ref to the controls, so that we can update them on every frame using useFrame
   const controls = useRef();
   useFrame((state) => controls.current.update());
-
+  domElement.outputEncoding = THREE.sRGBEncoding;
   
-  const grid = new THREE.GridHelper(500,10,0x303030,0x303030)
-  grid.geometry.rotateX(Math.PI / 2)
+  // const material = new THREE.LineBasicMaterial({ color: 0xffffff })
+  // const points = [];
+  // points.push( new THREE.Vector2(-100,0))
+  // points.push( new THREE.Vector2(100,0))
+  // points.push( new THREE.Vector2(0,-100))
+  // points.push( new THREE.Vector2(0,100))
+  // const geometry = new THREE.BufferGeometry().setF( points )
+  // const line = new THREE.Line( geometry, material )
+  // const grid = new THREE.GridHelper(300,60,0xffffff,0xffffff)
+  // grid.geometry.rotateX(Math.PI / 2)
+  const grid = GridMaker()
   scene.add(grid)
   useFrame(({gl, scene, camera}) => gl.render(scene, camera), 1)
 
