@@ -20,7 +20,7 @@ export default function CanvasContainer({objectProps, control, saveX, saveY}) {
   
   return (
     <Canvas 
-      style={{ background: "#ffffff" }} 
+      style={{ background: "#ffffff", zIndex:0 }} 
       camera={ortho?new THREE.OrthographicCamera(-200*1,200*1,200,-200,0.1,100000):new THREE.PerspectiveCamera(35, 1, 5, 100000 )}
       resize={true}
     > 

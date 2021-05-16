@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useThree, useLoader, useFrame } from '@react-three/fiber'
 import GridMaker from './GridMaker'
-import { OrbitControls, TransformControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { DragControls } from 'three/examples/jsm/controls/DragControls'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 
 var boundings = []
@@ -18,7 +19,7 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
     scene,
   } = useThree();
   const orbit = useRef()
-  const transform = useRef()
+  // const transform = useRef()
   
   useEffect(()=>{
     camera.position.x = 0;
@@ -27,15 +28,14 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
     GridMaker(300, 200, 200, 0x000000, 0x999999, scene)
     setGo(false)
   }, [])
-  
+  console.log(gl.domElement)
   useEffect(() => {
     orbit.current.enabled = false;
-    transform.current.enabled = false;
+    // transform.current.enabled = false;
     
     if(activeControl===2){
-      const drag = new DragControls([mesh.current], camera, gl.domElement)
+      const drag = new DragControls(camera, gl.domElement)
       drag.addEventListener('dragstart', function(e){
-        console.log('drag start')
         setGo(false)
       })
       // drag.addEventListener('drag', function(e){
@@ -44,7 +44,6 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
       drag.addEventListener('dragend', function(e){
         saveX(mesh.current.position.x)
         saveY(mesh.current.position.y)
-        console.log('drag end')
         setGo(true)
       })
       scene.add(drag)
@@ -62,14 +61,20 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
       console.log(boundings)
 
     }
-    else if (activeControl === 3){
-      orbit.current.enabled = true;
-      transform.current.enabled=true;
-      transform.current.setMode('rotate')
-      transform.current.setSize(1)
+    else if(activeControl===3) {
+      orbit.current.enabled = false;
+      const trans = new TransformControls(camera, gl.domElement)
+      trans.attach(mesh.current)
+      scene.add(trans)
+      // trans.showZ = false
+      trans.position.z = 1;
+      trans.setMode("rotate")
+      // transform.current.enabled = true;
+      // transform.current.setMode("rotate")
+      // transform.current.setSize(2)
     }
     else{
-      transform.current.enabled=false;
+      // scene.remove(drag)
       orbit.current.enabled = true;
     }
   }, [activeControl])
@@ -94,7 +99,6 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
       }
     }
     else if(activeControl===2){
-      // console.log("Faster?")
       mesh.current.position.z = 0
       if(mesh.current.position.x >= 150-boundings[0]) {
         mesh.current.position.x = 150-boundings[0]
@@ -131,7 +135,7 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
   return (
     // <PerspectiveCamera makeDefault={!ortho} /
     <>
-    <TransformControls ref={transform}>
+    {/* <TransformControls ref={transform} showZ={true}> */}
       <group>
         <mesh ref={mesh} frustumCulled={false} visible geometry={geom} userData>
           <meshStandardMaterial
@@ -145,7 +149,7 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
           />
         </mesh>
       </group>
-    </TransformControls>
+    {/* </TransformControls> */}
     <OrbitControls
       // ref={controls}
       ref={orbit}
@@ -155,7 +159,6 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
       maxPolarAngle={Math.PI}
       minAzimuthAngle={-Math.PI / 2}
       minPolarAngle={0}
-      enableDamping={false}
     />
     {/* <DragControls ref={drag}/> */}
     </>

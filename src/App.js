@@ -6,7 +6,8 @@ import CanvasContainer from './containers/CanvasContainer'
 import ControlButtons from './components/ControlButtons'
 
 var Control_Gui = [undefined, undefined, undefined, undefined, undefined]
-
+var x_control = undefined
+var y_control = undefined
 export default function App() { 
   const [activeGui, setActiveGui] = useState(-1)
 
@@ -37,9 +38,18 @@ export default function App() {
   }, [])
   const setPositionX = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, x: newValue }))
+    
   }, [])
   const setPositionY = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, y: newValue }))
+  }, [])
+  const callbackSetPositionX = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, x: newValue }))
+    x_control.setValue(newValue)
+  }, [])
+  const cabllbackSetPositionY = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, y: newValue }))
+    y_control.setValue(newValue)
   }, [])
   var object = {
     color: objectProperty.color,
@@ -67,10 +77,10 @@ export default function App() {
     Control_Gui[2] = new dat.GUI({width:250});
     Control_Gui[2].domElement.id = 'control-gui'
     const positionFolder = Control_Gui[2].addFolder("Position")
-    positionFolder.add(object, "position_x", -150, 150, 1).onChange(()=>{
+    x_control = positionFolder.add(object, "position_x", -150, 150, 1).onChange(()=>{
       setPositionX(object.position_x)
     })
-    positionFolder.add(object, "position_y", -100, 100, 1).onChange(()=>{
+    y_control = positionFolder.add(object, "position_y", -100, 100, 1).onChange(()=>{
       setPositionY(object.position_y)
     })
     positionFolder.open()
@@ -82,7 +92,7 @@ export default function App() {
   return (
     <>
       <ControlButtons toggleSetup={toggleSetup} />
-      <CanvasContainer objectProps={objectProperty} control={activeGui} saveX={setPositionX} saveY={setPositionY}/>
+      <CanvasContainer objectProps={objectProperty} control={activeGui} saveX={callbackSetPositionX} saveY={cabllbackSetPositionY}/>
     </>
   );
 }
