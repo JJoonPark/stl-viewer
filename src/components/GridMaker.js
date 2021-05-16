@@ -71,7 +71,8 @@ export default function GridMaker(
   const Plane_Geometry = new THREE.BoxGeometry(width, height, 2);
   const Plane_Material = new THREE.MeshBasicMaterial({
     color: 0xffffff,
-    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.5
   });
   const gridPlane = new THREE.Mesh(Plane_Geometry, Plane_Material);
   const unitMinor = 5;
@@ -205,7 +206,7 @@ export default function GridMaker(
   
   view.add(makeLinesFromPoints(majors, colorMajor || 0x666666, 1));
   view.add(makeLinesFromPoints(minors, colorMinor || 0xcccccc, 1));
-  //view.add(gridPlane);
+  view.add(gridPlane);
 
   scene.remove(old_view);
   old_view = view;

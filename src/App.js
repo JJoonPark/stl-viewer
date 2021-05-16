@@ -6,8 +6,11 @@ import CanvasContainer from './containers/CanvasContainer'
 import ControlButtons from './components/ControlButtons'
 
 var Control_Gui = [undefined, undefined, undefined, undefined, undefined]
-var x_control = undefined
-var y_control = undefined
+var x_position = undefined
+var y_position = undefined
+var x_rotation = undefined
+var y_rotation = undefined
+var z_rotation = undefined
 export default function App() { 
   const [activeGui, setActiveGui] = useState(-1)
 
@@ -25,7 +28,10 @@ export default function App() {
     wireframe:false,
     opacity: 1,
     x:0,
-    y:0
+    y:0,
+    rotate_x:0,
+    rotate_y:0,
+    rotate_z:0,
   })
   const setColor = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, color: newValue }))
@@ -45,18 +51,45 @@ export default function App() {
   }, [])
   const callbackSetPositionX = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, x: newValue }))
-    x_control.setValue(newValue)
+    x_position.setValue(newValue)
   }, [])
-  const cabllbackSetPositionY = useCallback((newValue) => {
+  const callbackSetPositionY = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, y: newValue }))
-    y_control.setValue(newValue)
+    y_position.setValue(newValue)
+  }, [])
+  const setRotationX = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, rotate_x: newValue }))
+  }, [])
+  const setRotationY = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, rotate_y: newValue }))
+  }, [])
+  const setRotationZ = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, rotate_z: newValue }))
+  }, [])
+  const callbackSetRotationX = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, rotate_x: newValue }))
+    console.log(newValue)
+    x_rotation.setValue(newValue / (Math.PI / 180))
+  }, [])
+  const callbackSetRotationY = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, rotate_y: newValue }))
+    console.log(newValue)
+    y_rotation.setValue(newValue / (Math.PI / 180))
+  }, [])
+  const callbackSetRotationZ = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, rotate_z: newValue }))
+    console.log(newValue)
+    z_rotation.setValue(newValue / (Math.PI / 180))
   }, [])
   var object = {
     color: objectProperty.color,
     wireframe: objectProperty.wireframe,
     opacity: objectProperty.opacity,
     position_x: objectProperty.x,
-    position_y: objectProperty.y
+    position_y: objectProperty.y,
+    rotation_x: objectProperty.rotate_x,
+    rotation_y: objectProperty.rotate_y,
+    rotation_z: objectProperty.rotate_z,
   }
   
   useEffect(()=>{
@@ -77,22 +110,46 @@ export default function App() {
     Control_Gui[2] = new dat.GUI({width:250});
     Control_Gui[2].domElement.id = 'control-gui'
     const positionFolder = Control_Gui[2].addFolder("Position")
-    x_control = positionFolder.add(object, "position_x", -150, 150, 1).onChange(()=>{
+    x_position = positionFolder.add(object, "position_x", -150, 150, 1).onChange(()=>{
       setPositionX(object.position_x)
     })
-    y_control = positionFolder.add(object, "position_y", -100, 100, 1).onChange(()=>{
+    y_position = positionFolder.add(object, "position_y", -100, 100, 1).onChange(()=>{
       setPositionY(object.position_y)
     })
     positionFolder.open()
+
+    Control_Gui[3] = new dat.GUI({width:250});
+    Control_Gui[3].domElement.id = 'control-gui'
+    const rotationFolder = Control_Gui[3].addFolder("Rotation")
+    x_rotation = rotationFolder.add(object, "rotation_x", -180, 180, 1).onChange(()=>{
+      setRotationX(object.rotation_x * (Math.PI / 180))
+    })
+    y_rotation = rotationFolder.add(object, "rotation_y", -180, 180, 1).onChange(()=>{
+      setRotationY(object.rotation_y * (Math.PI / 180))
+    })
+    z_rotation = rotationFolder.add(object, "rotation_z", -180, 180, 1).onChange(()=>{
+      setRotationZ(object.rotation_z * (Math.PI / 180))
+    })
+    rotationFolder.open()
+
     Control_Gui[1].hide()
     Control_Gui[2].hide()
+    Control_Gui[3].hide()
   }, [])
   // console.log(objectProperty)
 
   return (
     <>
       <ControlButtons toggleSetup={toggleSetup} />
-      <CanvasContainer objectProps={objectProperty} control={activeGui} saveX={callbackSetPositionX} saveY={cabllbackSetPositionY}/>
+      <CanvasContainer 
+        objectProps={objectProperty} 
+        control={activeGui} 
+        posX={callbackSetPositionX} 
+        posY={callbackSetPositionY}
+        rotX={callbackSetRotationX}
+        rotY={callbackSetRotationY}
+        rotZ={callbackSetRotationZ}
+      />
     </>
   );
 }

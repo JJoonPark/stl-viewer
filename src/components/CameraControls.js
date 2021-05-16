@@ -8,7 +8,7 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 
 var boundings = []
 
-const CameraControls = ({props, activeControl, saveX, saveY}) => {
+const CameraControls = ({props, activeControl, posX, posY, rotX, rotY, rotZ}) => {
   const geom = useLoader(STLLoader, "./Bunny.stl");
   const [go, setGo] = useState(false)
   const mesh = useRef()
@@ -42,8 +42,8 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
       //   console.log('drag')
       // })
       drag.addEventListener('dragend', function(e){
-        saveX(mesh.current.position.x)
-        saveY(mesh.current.position.y)
+        posX(mesh.current.position.x)
+        posY(mesh.current.position.y)
         console.log('drag end')
         setGo(true)
       })
@@ -63,9 +63,28 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
 
     }
     else if (activeControl === 3){
-      orbit.current.enabled = true;
+      orbit.current.enabled = false;
       transform.current.enabled=true;
       transform.current.setMode('rotate')
+      transform.current.setSize(1)
+
+      transform.current.addEventListener('dragging-changed', function(e){
+        console.log('dragging-changed')
+      })
+
+      transform.current.addEventListener('mouseUp', function(e){
+        console.log("enter this", mesh.current.rotation)
+        console.log(mesh.current)
+        console.log(transform)
+        rotX(mesh.current.rotation.x)
+        rotY(mesh.current.rotation.y)
+        rotZ(mesh.current.rotation.z)
+      })
+    }
+    else if (activeControl === 4) {
+      orbit.current.enabled = false;
+      transform.current.enabled=true;
+      transform.current.setMode('scale')
       transform.current.setSize(1)
     }
     else{
@@ -108,6 +127,11 @@ const CameraControls = ({props, activeControl, saveX, saveY}) => {
       if(mesh.current.position.y <= -100+boundings[3]) {
         mesh.current.position.y = -100+boundings[3]
       }
+    }
+    else if(activeControl==3){
+      mesh.current.rotation.x = props.rotate_x
+      mesh.current.rotation.y = props.rotate_y
+      mesh.current.rotation.z = props.rotate_z
     }
     else{
       mesh.current.position.x = props.x

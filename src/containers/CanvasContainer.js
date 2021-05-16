@@ -10,7 +10,7 @@ import LoadingView from '../components/LoadingView'
 
 extend({ OrbitControls })
 
-export default function CanvasContainer({objectProps, control, saveX, saveY}) {
+export default function CanvasContainer({objectProps, control, posX, posY, rotX, rotY, rotZ}) {
   const [ ortho, setOrth ] = useState(true)
   const [ aspect, setAspect ] = useState(1)
 
@@ -27,7 +27,7 @@ export default function CanvasContainer({objectProps, control, saveX, saveY}) {
       <directionalLight intensity={0.5} position={[10,-10,10]}/>
       <axesHelper/>
       <Suspense fallback={<LoadingView />}>
-        <CameraControls props={objectProps} activeControl={control} saveX={saveX} saveY={saveY}/>  
+        <CameraControls props={objectProps} activeControl={control} posX={posX} posY={posY} rotX={rotX} rotY={rotY} rotZ={rotZ}/>  
       </Suspense>
     </Canvas>
   );
