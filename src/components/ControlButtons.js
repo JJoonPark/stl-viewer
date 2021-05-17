@@ -53,10 +53,11 @@ const useStyles = makeStyles((theme) => ({
     // borderRight: `1px solid ${theme.palette.divider}`,
   },
   tab: {
-    width: '120px',
-    height: '60px',
-    fontSize: 'large',
-    minWidth: '50px',
+    // width: '50px',
+    // height: `${window.innerHeight*0.06}px`,
+    minHeight: `${window.innerHeight*0.07}px`,
+    fontSize: 'small',
+    minWidth: `${window.innerWidth*0.1-10}px`,
   }
 }));
 
@@ -82,7 +83,6 @@ export default function ControlButtons(props) {
         <Tab className={classes.tab} label="Position" onClick={()=>props.toggleSetup(2)} {...a11yProps(2)} />
         <Tab className={classes.tab} label="Rotation" onClick={()=>props.toggleSetup(3)} {...a11yProps(3)} />
         <Tab className={classes.tab} label="Scale" onClick={()=>props.toggleSetup(4)} {...a11yProps(4)} />
-        <Tab className={classes.tab} label="Disabled" disabled onClick={()=>props.toggleSetup(5)} {...a11yProps(5)} />
       </Tabs>
       {/* <TabPanel value={value} index={0}>
         Item One

@@ -7,10 +7,19 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 
 var boundings = []
+var drag = undefined
+var go = false
+var isStart = false
+var euler = new THREE.Euler(0,0,0,'XYZ')
 
-const CameraControls = ({props, activeControl, posX, posY, rotX, rotY, rotZ}) => {
+var globals = {
+  'dragstart':undefined,
+  'dragend':undefined,
+  'draggingchanged':undefined,
+};
+
+const CameraControls = ({props, activeControl, posX, posY, rotX, rotY, rotZ, scaX, scaY, scaZ}) => {
   const geom = useLoader(STLLoader, "./Bunny.stl");
-  const [go, setGo] = useState(false)
   const mesh = useRef()
   const {
     camera,
@@ -25,60 +34,104 @@ const CameraControls = ({props, activeControl, posX, posY, rotX, rotY, rotZ}) =>
     camera.position.y = -400;
     camera.position.z = 640;
     GridMaker(300, 200, 200, 0x000000, 0x999999, scene)
-    setGo(false)
+    go = true
+    isStart = false
   }, [])
   
   useEffect(() => {
-    orbit.current.enabled = false;
+    //orbit.current.enabled = false;
     transform.current.enabled = false;
-    
-    if(activeControl===2){
-      const drag = new DragControls([mesh.current], camera, gl.domElement)
-      drag.addEventListener('dragstart', function(e){
+    console.log(globals)
+    if(globals.dragstart=="exist"){
+      drag.removeEventListener('dragstart', function(e){
         console.log('drag start')
-        setGo(false)
+        globals.dragstart = "exist"
+        orbit.current.enabled=false
+        go=false;
       })
-      // drag.addEventListener('drag', function(e){
-      //   console.log('drag')
-      // })
-      drag.addEventListener('dragend', function(e){
+      globals.dragstart=undefined
+    }
+    if(globals.dragend=="exist"){
+      drag.removeEventListener("dragend", function(e){
+        console.log('drag end')
+        globals.dragend = "exist"
         posX(mesh.current.position.x)
         posY(mesh.current.position.y)
+        console.log(mesh.current.position)
+        console.log(boundings)
+        orbit.current.enabled=true
+        go = true
+      })
+      globals.dragend=undefined
+    }
+    if(globals.draggingchanged==="exist"){
+      transform.current.removeEventListener("dragging-changed")
+      globals.draggingchanged=undefined
+    }
+    if(drag!==undefined) {
+      drag.enabled=false
+    }
+    if(activeControl===2){
+      go=true;
+      drag = new DragControls([mesh.current], camera, gl.domElement)
+      globals.dragstart = drag.addEventListener('dragstart', function(e){
+        console.log('drag start')
+        globals.dragstart = "exist"
+        orbit.current.enabled=false
+        go=false;
+      })
+      globals.dragend = drag.addEventListener('dragend', function(e){
         console.log('drag end')
-        setGo(true)
+        globals.dragend = "exist"
+        posX(mesh.current.position.x)
+        posY(mesh.current.position.y)
+        console.log(mesh.current.position)
+        console.log(boundings)
+        orbit.current.enabled=true
+        go = true
       })
       scene.add(drag)
+      console.log(mesh.current)
+      mesh.current.geometry.computeBoundingBox()
+      console.log(mesh.current.geometry.boundingBox)
       var helper = new THREE.BoxHelper(mesh.current, 0x000000)
       helper.geometry.computeBoundingBox()
       var helper_values = helper.geometry.boundingBox
+      console.log(mesh.current.position)
+      console.log(helper_values)
       boundings = [
-        helper_values.max.x-mesh.current.position.x, 
-        mesh.current.position.x-helper_values.min.x, 
-        helper_values.max.y-mesh.current.position.y,
-        mesh.current.position.y-helper_values.min.y]
-      
-      
-      console.log(props.x, props.y)
-      console.log(boundings)
-
+        Math.abs(helper_values.max.x-mesh.current.position.x), 
+        Math.abs(mesh.current.position.x-helper_values.min.x), 
+        Math.abs(helper_values.max.y-mesh.current.position.y),
+        Math.abs(mesh.current.position.y-helper_values.min.y)]
+        console.log(boundings)
     }
     else if (activeControl === 3){
-      orbit.current.enabled = false;
       transform.current.enabled=true;
       transform.current.setMode('rotate')
       transform.current.setSize(1)
+      transform.current.setSpace("local")
+      transform.current.position.x = mesh.current.position.x
+      transform.current.position.y = mesh.current.position.y
+      transform.current.position.z = mesh.current.position.z
+      console.log(transform.current.position)
 
       transform.current.addEventListener('dragging-changed', function(e){
-        console.log('dragging-changed')
-      })
-
-      transform.current.addEventListener('mouseUp', function(e){
-        console.log("enter this", mesh.current.rotation)
-        console.log(mesh.current)
-        console.log(transform)
-        rotX(mesh.current.rotation.x)
-        rotY(mesh.current.rotation.y)
-        rotZ(mesh.current.rotation.z)
+        globals.draggingchanged = "exist"
+        isStart=!isStart
+        if(isStart) {
+          orbit.current.enabled = false;
+          go=false
+          console.log("dragging-start", transform.current.axis)
+        } else {
+          console.log("dragging-end", isStart)
+          euler = transform.current.object.rotation
+          rotX(transform.current.object.rotation.x)
+          rotY(transform.current.object.rotation.y)
+          rotZ(transform.current.object.rotation.z)
+          orbit.current.enabled = true;
+          go = true
+        }
       })
     }
     else if (activeControl === 4) {
@@ -128,10 +181,10 @@ const CameraControls = ({props, activeControl, posX, posY, rotX, rotY, rotZ}) =>
         mesh.current.position.y = -100+boundings[3]
       }
     }
-    else if(activeControl==3){
-      mesh.current.rotation.x = props.rotate_x
-      mesh.current.rotation.y = props.rotate_y
-      mesh.current.rotation.z = props.rotate_z
+    else if(activeControl==3&&go){
+      transform.current.object.rotation.x = props.rotate_x
+      transform.current.object.rotation.y = props.rotate_y
+      transform.current.object.rotation.z = props.rotate_z
     }
     else{
       mesh.current.position.x = props.x
@@ -155,7 +208,7 @@ const CameraControls = ({props, activeControl, posX, posY, rotX, rotY, rotZ}) =>
   return (
     // <PerspectiveCamera makeDefault={!ortho} /
     <>
-    <TransformControls ref={transform}>
+    <TransformControls ref={transform} space={"local"}>
       <group>
         <mesh ref={mesh} frustumCulled={false} visible geometry={geom} userData>
           <meshStandardMaterial

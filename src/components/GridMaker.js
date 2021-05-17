@@ -77,7 +77,7 @@ export default function GridMaker(
   const gridPlane = new THREE.Mesh(Plane_Geometry, Plane_Material);
   const unitMinor = 5;
   const unitMajor = 25;
-  const fontScale = 1;
+  const fontScale = 1.5;
 
   let majors = [],
     minors = [],
@@ -142,7 +142,7 @@ export default function GridMaker(
       context.fillText(i.toString(), xo + i + xPadding / 2, 0);
     }
 
-    context.font = labelSize * 0.75 + "px sans-serif";
+    context.font = labelSize * 1 + "px sans-serif";
     context.fillText(xlabel, (x + xPadding) / 2, labelSize * 1.5);
     mesh.position.set(0, -h - labelSize * 2, zp);
     view.add(mesh);
@@ -172,7 +172,7 @@ export default function GridMaker(
       );
     }
 
-    context.font = labelSize * 0.75 + "px sans-serif";
+    context.font = labelSize * 1 + "px sans-serif";
     context.fillText(ylabel, labelSize * 1.25, (y + yPadding) / 2);
     mesh.position.set(-w - labelSize * 2 - 5, 0, zp);
     view.add(mesh);

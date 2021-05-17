@@ -11,6 +11,9 @@ var y_position = undefined
 var x_rotation = undefined
 var y_rotation = undefined
 var z_rotation = undefined
+var x_scale = undefined
+var y_scale = undefined
+var z_scale = undefined
 export default function App() { 
   const [activeGui, setActiveGui] = useState(-1)
 
@@ -32,6 +35,9 @@ export default function App() {
     rotate_x:0,
     rotate_y:0,
     rotate_z:0,
+    scale_x:0,
+    scale_y:0,
+    scale_z:0
   })
   const setColor = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, color: newValue }))
@@ -44,17 +50,14 @@ export default function App() {
   }, [])
   const setPositionX = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, x: newValue }))
-    
   }, [])
   const setPositionY = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, y: newValue }))
   }, [])
   const callbackSetPositionX = useCallback((newValue) => {
-    setObjectProperty((prev) => ({ ...prev, x: newValue }))
     x_position.setValue(newValue)
   }, [])
   const callbackSetPositionY = useCallback((newValue) => {
-    setObjectProperty((prev) => ({ ...prev, y: newValue }))
     y_position.setValue(newValue)
   }, [])
   const setRotationX = useCallback((newValue) => {
@@ -67,19 +70,31 @@ export default function App() {
     setObjectProperty((prev) => ({ ...prev, rotate_z: newValue }))
   }, [])
   const callbackSetRotationX = useCallback((newValue) => {
-    setObjectProperty((prev) => ({ ...prev, rotate_x: newValue }))
-    console.log(newValue)
     x_rotation.setValue(newValue / (Math.PI / 180))
   }, [])
-  const callbackSetRotationY = useCallback((newValue) => {
-    setObjectProperty((prev) => ({ ...prev, rotate_y: newValue }))
-    console.log(newValue)
+  const callbackSetRotationY = useCallback((newValue) => {    
     y_rotation.setValue(newValue / (Math.PI / 180))
   }, [])
   const callbackSetRotationZ = useCallback((newValue) => {
-    setObjectProperty((prev) => ({ ...prev, rotate_z: newValue }))
-    console.log(newValue)
     z_rotation.setValue(newValue / (Math.PI / 180))
+  }, [])
+  const setScaleX = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, scale_x: newValue }))
+  }, [])
+  const setScaleY = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, scale_y: newValue }))
+  }, [])
+  const setScaleZ = useCallback((newValue) => {
+    setObjectProperty((prev) => ({ ...prev, scale_z: newValue }))
+  }, [])
+  const callbackSetScaleX = useCallback((newValue) => {
+    x_scale.setValue(newValue)
+  }, [])
+  const callbackSetScaleY = useCallback((newValue) => {
+    y_scale.setValue(newValue)
+  }, [])
+  const callbackSetScaleZ = useCallback((newValue) => {
+    z_scale.setValue(newValue)
   }, [])
   var object = {
     color: objectProperty.color,
@@ -90,10 +105,13 @@ export default function App() {
     rotation_x: objectProperty.rotate_x,
     rotation_y: objectProperty.rotate_y,
     rotation_z: objectProperty.rotate_z,
+    scale_x: objectProperty.scale_x,
+    scale_y: objectProperty.scale_y,
+    scale_z: objectProperty.scale_z
   }
   
   useEffect(()=>{
-    Control_Gui[1] = new dat.GUI({width:250});
+    Control_Gui[1] = new dat.GUI({width:window.innerWidth*0.2});
     Control_Gui[1].domElement.id = 'control-gui'
     const materialFolder = Control_Gui[1].addFolder("Material")
     materialFolder.addColor(object, "color").onChange(()=>{
@@ -107,7 +125,7 @@ export default function App() {
     })
     materialFolder.open()
 
-    Control_Gui[2] = new dat.GUI({width:250});
+    Control_Gui[2] = new dat.GUI({width:window.innerWidth*0.2});
     Control_Gui[2].domElement.id = 'control-gui'
     const positionFolder = Control_Gui[2].addFolder("Position")
     x_position = positionFolder.add(object, "position_x", -150, 150, 1).onChange(()=>{
@@ -118,7 +136,7 @@ export default function App() {
     })
     positionFolder.open()
 
-    Control_Gui[3] = new dat.GUI({width:250});
+    Control_Gui[3] = new dat.GUI({width:window.innerWidth*0.2});
     Control_Gui[3].domElement.id = 'control-gui'
     const rotationFolder = Control_Gui[3].addFolder("Rotation")
     x_rotation = rotationFolder.add(object, "rotation_x", -180, 180, 1).onChange(()=>{
@@ -132,9 +150,24 @@ export default function App() {
     })
     rotationFolder.open()
 
+    Control_Gui[4] = new dat.GUI({width:window.innerWidth*0.2})
+    Control_Gui[4].domElement.id = 'control-gui'
+    const scaleFolder = Control_Gui[4].addFolder("Scale")
+    x_scale = scaleFolder.add(object, "scale_x", -3, 3, 0.1).onChange(()=>{
+      setScaleX(object.scale_x)
+    })
+    y_scale = scaleFolder.add(object, "scale_y", -3, 3, 0.1).onChange(()=>{
+      setScaleY(object.scale_y)
+    })
+    z_scale = scaleFolder.add(object, "scale_z", -3, 3, 0.1).onChange(()=>{
+      setScaleZ(object.scale_z)
+    })
+    scaleFolder.open()
+
     Control_Gui[1].hide()
     Control_Gui[2].hide()
     Control_Gui[3].hide()
+    Control_Gui[4].hide()
   }, [])
   // console.log(objectProperty)
 
@@ -149,6 +182,9 @@ export default function App() {
         rotX={callbackSetRotationX}
         rotY={callbackSetRotationY}
         rotZ={callbackSetRotationZ}
+        scaX={callbackSetScaleX}
+        scaY={callbackSetScaleY}
+        scaZ={callbackSetScaleZ}
       />
     </>
   );

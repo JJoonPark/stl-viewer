@@ -5,8 +5,7 @@ node_modules/*
 !node_modules/three-stdlib
 node_modules/three-stdlib/*
 !node_modules/three-stdlib/controls/
-node_modules/three-stdlib/controls/*
-!node_modules/three-stdlib/controls/TransformControls.js
+
 
 /.pnp
 .pnp.js

@@ -9,6 +9,7 @@ body,
   position: absolute;
   right: 0%;
   top: 20vh;
+  width: 10vw;
 }
 
 .view-button {
