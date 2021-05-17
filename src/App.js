@@ -35,9 +35,9 @@ export default function App() {
     rotate_x:0,
     rotate_y:0,
     rotate_z:0,
-    scale_x:0,
-    scale_y:0,
-    scale_z:0
+    scale_x:1,
+    scale_y:1,
+    scale_z:1
   })
   const setColor = useCallback((newValue) => {
     setObjectProperty((prev) => ({ ...prev, color: newValue }))
@@ -153,13 +153,13 @@ export default function App() {
     Control_Gui[4] = new dat.GUI({width:window.innerWidth*0.2})
     Control_Gui[4].domElement.id = 'control-gui'
     const scaleFolder = Control_Gui[4].addFolder("Scale")
-    x_scale = scaleFolder.add(object, "scale_x", -3, 3, 0.1).onChange(()=>{
+    x_scale = scaleFolder.add(object, "scale_x", 0.1, 5).onChange(()=>{
       setScaleX(object.scale_x)
     })
-    y_scale = scaleFolder.add(object, "scale_y", -3, 3, 0.1).onChange(()=>{
+    y_scale = scaleFolder.add(object, "scale_y", 0.1, 5).onChange(()=>{
       setScaleY(object.scale_y)
     })
-    z_scale = scaleFolder.add(object, "scale_z", -3, 3, 0.1).onChange(()=>{
+    z_scale = scaleFolder.add(object, "scale_z", 0.1, 5).onChange(()=>{
       setScaleZ(object.scale_z)
     })
     scaleFolder.open()
@@ -169,7 +169,6 @@ export default function App() {
     Control_Gui[3].hide()
     Control_Gui[4].hide()
   }, [])
-  // console.log(objectProperty)
 
   return (
     <>
